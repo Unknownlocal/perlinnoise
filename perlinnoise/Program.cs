@@ -10,43 +10,79 @@ namespace perlinnoise
     class Program
     {
         public double[,] smoothnoise= new double[64,64];
-        public int freq=64, octave=1;
-        
+        public int freq=1, octave=1;
+        public double currentnoise=0;
         public void WhiteNoise()
         {
             Random random = new Random();
             //for (int f=1;f<=64;f/=2)
             //{
-                //freq = f;                
-                for (int x=0;x<smoothnoise.GetLength(0);x+=freq)
+                //freq = f;             //for everysqaure generate a noise value   
+                //for each octave in the 64x64 array, generate one noise value and add it on. as freq--, make each ovtace have the same randvalue added to it
+            while (freq <= smoothnoise.GetLength(0)||freq <= smoothnoise.GetLength(1))
+            {
+                for (int i = 0; i < (smoothnoise.GetLength(0) / freq); i++)
                 {
-                    for (int y=0;y<smoothnoise.GetLength(1);y+=freq)
+                    for (int j = 0; j < (smoothnoise.GetLength(1) / freq); j++)
                     {
-                        smoothnoise[x, y] += random.NextDouble();
+                        //for each block.
+                        currentnoise = random.NextDouble();
+                        for (int x = 0; x < freq; x++)
+                        {
+                            for (int y = 0; y < freq; y++)
+                            {
+                                smoothnoise[((i * freq) + x), ((j * freq) + y)] += currentnoise;
+                            }
+                        }
                     }
                 }
+                freq *= 2;
                 octave += 1;
-            //}
-        }
-        public void Draw()
-        {
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Width = 600;pictureBox.Height = 800;
-            pictureBox.Show();
-            pictureBox.CreateControl(); 
-            Graphics g = pictureBox.CreateGraphics();
-            Bitmap bitmap = new Bitmap(pictureBox.Width, pictureBox.Height, g);
-            for(int x=0;x<bitmap.Width;x++)
+                
+            }
+            for(int x=0;x<smoothnoise.GetLength(0);x++)
             {
-                for(int y=0;y<bitmap.Height;y++)
+                for(int y=0;y<smoothnoise.GetLength(1);y++)
                 {
-                    
+                    smoothnoise[x, y] /= octave;
                 }
             }
+            //interpolation and standardization
+            /*for (int c=0;c<smoothnoise.GetLength(0);c++)
+            {
+                for (int d=0;d<smoothnoise.GetLength(1);d++)
+                {
                     
-        }            
+                    if (c < -1+smoothnoise.GetLength(0)&&d<-1+smoothnoise.GetLength(1))
+                    {
+                        smoothnoise[c, d] = ((smoothnoise[c + 1, d] + smoothnoise[c, d + 1] + smoothnoise[c + 1, d + 1] + smoothnoise[c, d]) / 4)/octave;
+                    }
+                    else
+                    {
+                        smoothnoise[c, d] /= octave;
+                    }
+                }
+            }*/
+            for (int a = 0; a < smoothnoise.GetLength(0); a++)
+            {
+                for (int b = 0; b < smoothnoise.GetLength(1); b++)
+                {
+
+                    Console.WriteLine("Noise Value at [{0},{1}] is: {2}", a, b, smoothnoise[a, b]);
+                }
+            }
+
+            //}
+        }
+        
         static void Main(string[] args)
         {
+            Program program = new Program();
+            DrawOutput draw = new DrawOutput();
+            program.WhiteNoise();
+            draw.ToBitmap(program.smoothnoise);            
+            draw.TerrainMapper(draw.NoiseGradient(program.smoothnoise));
+            Console.ReadLine();
         }
     }
 }
