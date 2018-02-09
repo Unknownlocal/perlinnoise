@@ -9,7 +9,7 @@ namespace perlinnoise
 {
     class Program
     {
-        public double[,] smoothnoise= new double[64,64];
+        public double[,] smoothnoise= new double[1024,1024];
         public int freq=1, octave=1;
         public double currentnoise=0;
         public void WhiteNoise()
