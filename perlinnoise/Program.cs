@@ -9,7 +9,7 @@ namespace perlinnoise
 {
     class Program
     {
-        public double[,] smoothnoise= new double[1024,1024];
+        public double[,] smoothnoise= new double[512,512];
         public int freq=1, octave=1;
         public double currentnoise=0;
         public void WhiteNoise()
@@ -63,14 +63,14 @@ namespace perlinnoise
                     }
                 }
             }*/
-            for (int a = 0; a < smoothnoise.GetLength(0); a++)
+            /*for (int a = 0; a < smoothnoise.GetLength(0); a++)
             {
                 for (int b = 0; b < smoothnoise.GetLength(1); b++)
                 {
 
-                    Console.WriteLine("Noise Value at [{0},{1}] is: {2}", a, b, smoothnoise[a, b]);
+                   // Console.WriteLine("Noise Value at [{0},{1}] is: {2}", a, b, smoothnoise[a, b]);
                 }
-            }
+            }*/
 
             //}
         }
@@ -80,8 +80,12 @@ namespace perlinnoise
             Program program = new Program();
             DrawOutput draw = new DrawOutput();
             program.WhiteNoise();
-            draw.ToBitmap(program.smoothnoise);            
-            draw.TerrainMapper(draw.NoiseGradient(program.smoothnoise));
+            Console.WriteLine("whitenoise complete.");
+            draw.ToBitmap(program.smoothnoise);
+            Console.WriteLine("smoothnoise complete");
+            //draw.TerrainMapper(draw.NoiseGradient(program.smoothnoise));
+            draw.ColorMap(program.smoothnoise);
+            Console.WriteLine("ColorMap complete");
             Console.ReadLine();
         }
     }
