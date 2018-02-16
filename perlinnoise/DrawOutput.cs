@@ -19,24 +19,24 @@ namespace perlinnoise
             output = new Bitmap(pictureBox1.Width, pictureBox1.Height, pictureBox1.CreateGraphics());
             edit = new Bitmap(pictureBox1.Width, pictureBox1.Height, pictureBox1.CreateGraphics());
         }
-        
+
         public void ToBitmap(double[,] smoothnoise)
         {
             Graphics graphics = pictureBox1.CreateGraphics();
-            int boxsizeX = Convert.ToInt32(pictureBox1.Width / smoothnoise.GetLength(0)),boxsizeY = Convert.ToInt32(pictureBox1.Height/smoothnoise.GetLength(1));
-          //  Console.WriteLine("boxsizeX,Y are {0},{1} respectively. press enter to continue", boxsizeX, boxsizeY);
- //           Console.ReadLine();
+            int boxsizeX = Convert.ToInt32(pictureBox1.Width / smoothnoise.GetLength(0)), boxsizeY = Convert.ToInt32(pictureBox1.Height / smoothnoise.GetLength(1));
+            //  Console.WriteLine("boxsizeX,Y are {0},{1} respectively. press enter to continue", boxsizeX, boxsizeY);
+            //           Console.ReadLine();
             double color;
             pictureBox1.Show();
-            Bitmap bitmap= new Bitmap(pictureBox1.Width,pictureBox1.Height,graphics);
+            Bitmap bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height, graphics);
             double[] printout = new double[boxsizeX];
-            for (int x=0;x<smoothnoise.GetLength(0);x++)
+            for (int x = 0; x < smoothnoise.GetLength(0); x++)
             {
-                for (int y=0;y<smoothnoise.GetLength(1);y++)
+                for (int y = 0; y < smoothnoise.GetLength(1); y++)
                 {
                     //for each box in the bitmap
                     color = (255 * smoothnoise[x, y]);
-                   // Console.WriteLine("color value = {0}", color);
+                    // Console.WriteLine("color value = {0}", color);
                     for (int pxX = 0; pxX < boxsizeX; pxX++)
                     {
                         for (int pxY = 0; pxY < boxsizeY; pxY++)
@@ -45,7 +45,7 @@ namespace perlinnoise
 
                             //for each pixel in each box, set its color to var color
                             bitmap.SetPixel(((x * boxsizeX) + pxX), ((y * boxsizeY) + pxY), Color.FromArgb(255, Convert.ToInt32(color), Convert.ToInt32(color), Convert.ToInt32(color)));
-                           // Console.WriteLine("pixel set was: {0},{1}", (x * boxsizeX) + pxX, (y * boxsizeY) + pxY);
+                            // Console.WriteLine("pixel set was: {0},{1}", (x * boxsizeX) + pxX, (y * boxsizeY) + pxY);
                             pictureBox1.Image = bitmap;
                             pictureBox1.Refresh();
                             //Debug.WriteLine("grayscale color at [{0},{1}] is {2}", ((x * boxsizeX) + pxX), ((y * boxsizeY) + pxY), color);
@@ -55,33 +55,8 @@ namespace perlinnoise
                 }
             }
             bitmap.Save((Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)) + "\\noiseimg.png", System.Drawing.Imaging.ImageFormat.Png);
-            Console.WriteLine("Saved file. check image. press enter to generate interpolated image");
-//            Console.ReadLine();
-            //now for interpolation
-            double x0, x1, x2,x3, internoise;
-            for (int pointX = 0; pointX < smoothnoise.GetLength(0)-1; pointX++)
-            {
-                for (int pointY = 0; pointY < smoothnoise.GetLength(1)-1; pointY++)
-                {
-                    for (int pX=0;pX<boxsizeX;pX++)
-                    {
-                        for (int pY=0;pY<boxsizeY;pY++)
-                        {
-                            x0 = bitmap.GetPixel((pointX*boxsizeX)+pX, (boxsizeY*pointY)+pY).R;
-                            x1 = bitmap.GetPixel((boxsizeX*pointX)+pX + 1, (boxsizeY*pointY)+pY).R;
-                            x2 = bitmap.GetPixel((pointX*boxsizeX)+pX, (boxsizeY*pointY)+pY + 1).R;
-                            x3 = bitmap.GetPixel((pointX*boxsizeX)+pX+1,(boxsizeY*pointY)+pY+1).R;
-                            internoise = (x0 + x1 + x2 + x3) / 4;
-                           // Console.WriteLine("interpolated noise at {0},{1} is {2}", ((pointX*boxsizeX)+pX), ((pointY*boxsizeY)+pY), internoise);
-                            bitmap.SetPixel((pointX*boxsizeX)+pX, (boxsizeY*pointY)+pY, Color.FromArgb(255, Convert.ToInt32(internoise), Convert.ToInt32(internoise), Convert.ToInt32(internoise)));                           
-                        }
-                    }
-                    smoothnoise[(pointX), (pointY)] = bitmap.GetPixel((pointX * boxsizeX), (pointY*boxsizeY)).R;
-                }
-            }
-            bitmap.Save((Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)) + "\\internoiseimg.png", System.Drawing.Imaging.ImageFormat.Png);
-            Console.WriteLine("Interpolation complete. File saved on Desktop. Press enter to leave");
-            
+         
+            //            Console.ReadLine();
         }
        /* public double[,] NoiseGradient(double[,] smoothnoise)
         {//add bias into the map, central mountains and outside square of water

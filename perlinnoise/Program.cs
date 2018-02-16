@@ -117,6 +117,7 @@ namespace perlinnoise
         {
             Random rand = new Random();
             Random random = new Random();
+            double centerdist,xdist,ydist;
             int freq=1, octave=1;
             double current1, current2;
             while (freq <= noise1.GetLength(0)||freq<=noise1.GetLength(1))
@@ -167,10 +168,24 @@ namespace perlinnoise
             {
                 for (int py=0;py<noise2.GetLength(1);py++)
                 {
-                    fractal[px, py] = 0.5*(noise1[px, py] + noise2[px, py]);
+                    xdist = px - ((noise1.GetLength(0) + 1) / 2);
+                    ydist = py - ((noise1.GetLength(1) + 1) / 2);
+                    centerdist = Math.Pow(xdist, 2) + Math.Pow(ydist, 2);
+                    centerdist = Math.Sqrt(centerdist);
+                    fractal[px, py] = 0.1*Math.Sqrt(centerdist)*(noise1[px, py] + noise2[px, py]);
+                    Console.WriteLine("value of fractalnoise gird at [{0},{1}] is {2}, made with centerdist = {3}", px, py, fractal[px, py], centerdist);
+                    //check values are as 0<x<1
+                    if (fractal[px,py]>1)
+                    {
+                        fractal[px, py] = 1;
+                    }
+                    else if (fractal[px,py]<0)
+                    {
+                        fractal[px, py] = 0;
+                    }
                 }
             }
-            //fractal array now
+            
         }
         static void Main(string[] args)
         {
