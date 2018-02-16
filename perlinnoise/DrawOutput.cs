@@ -12,11 +12,14 @@ namespace perlinnoise
 {
     public partial class DrawOutput : Form
     {
-        
+        public Bitmap output,edit;
         public DrawOutput()
         {
             InitializeComponent();
+            output = new Bitmap(pictureBox1.Width, pictureBox1.Height, pictureBox1.CreateGraphics());
+            edit = new Bitmap(pictureBox1.Width, pictureBox1.Height, pictureBox1.CreateGraphics());
         }
+        
         public void ToBitmap(double[,] smoothnoise)
         {
             Graphics graphics = pictureBox1.CreateGraphics();
@@ -171,6 +174,7 @@ namespace perlinnoise
             }
             bitmap.Save((Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)) + "\\colornoiseimg.png", System.Drawing.Imaging.ImageFormat.Png);
             Console.WriteLine("Colored map saved. Press enter to leave");
+            output = bitmap;
         }
         public void ColorMap(double[,] smoothnoise)
         {
@@ -213,19 +217,22 @@ namespace perlinnoise
                     
                         }
                     }
-
+                    
                 }
             }
             colorbitmap.Save((Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)) + "\\colornoiseimg.png", System.Drawing.Imaging.ImageFormat.Png);
             Console.WriteLine("Saved color image.");
+            output = colorbitmap;
+            
         }
-        public void landmakerftw(double[,] smoothnoise,Bitmap bitmap)
-        {
-            Color c1, c2, c3, c4;
+        public void Landmakerftw(double[,] smoothnoise,Bitmap bitmap)
+        {//function to fix funky looking land in images
+            Color c1, c2, c3, c4,c5;
+            int ctr = 0;
             int boxSizeX, boxSizeY;
             boxSizeX = pictureBox1.Width / smoothnoise.GetLength(0);
             boxSizeY = pictureBox1.Height / smoothnoise.GetLength(1);
-            for (int a=0;a<smoothnoise.GetLength(0);a++)
+            /*for (int a=0;a<smoothnoise.GetLength(0);a++)
             {
                 for (int b=0;b<smoothnoise.GetLength(1);b++)
                 {
@@ -239,16 +246,101 @@ namespace perlinnoise
                                 c2 = bitmap.GetPixel((a * boxSizeX) +1+ c, (b * boxSizeY) + d);
                                 c3 = bitmap.GetPixel((a * boxSizeX) + c, (b * boxSizeY) + 1+d);
                                 c4 = bitmap.GetPixel((a * boxSizeX) +1+ c, (b * boxSizeY) +1+ d);
-                                for (int e=0;e<4;e++)
+                                if (c1 == c2)
                                 {
-                                    if (c1 == c2||c1==c3||c1==c4)
+                                    ctr++;
                                 }
+                                if (c1==c3)
+                                {
+                                    ctr++; 
+                                }
+                                if (c1==c4)
+                                {
+                                    ctr++;
+                                }
+                            }
+                            if (ctr >= 2)
+                            {
+                                bitmap.SetPixel((a * boxSizeX) + c, (b * boxSizeY) + d, Color.DarkBlue);
                             }
                         }
                     }
                 }
+            }*/
+            for (int x=01;x<bitmap.Width-1;x++)
+            {
+                for (int y=1;y<bitmap.Height-1;y++)
+                {
+                    c1 = bitmap.GetPixel(x, y);
+                    if (c1 != Color.DarkBlue)
+                    {
+                        c2 = bitmap.GetPixel(x, y - 1);
+                        c3 = bitmap.GetPixel(x + 1, y);
+                        c4 = bitmap.GetPixel(x, y + 1);
+                        c5 = bitmap.GetPixel(x - 1, y);
+                        if(c2 == Color.DarkBlue)
+                        {
+                            ctr++;
+                        }
+                        if (c3 == Color.DarkBlue)
+                        {
+                            ctr++;
+                        }
+                        if (c4 == Color.DarkBlue)
+                        {
+                            ctr++;
+                        }
+                        if (c5 == Color.DarkBlue)
+                        {
+                            ctr++;
+                        }
+                        if (ctr >=1)
+                        {
+                            bitmap.SetPixel(x, y, Color.DarkBlue);
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
             }
+            bitmap.Save((Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)) + "\\correctedcolornoiseimg.png", System.Drawing.Imaging.ImageFormat.Png);
+            Console.WriteLine("Saved corrected color image.");
+            edit = bitmap;
         }
-        
+        public void DiffChecker(Bitmap origin,Bitmap edited)
+        {
+            Color c1, c2;
+            
+            if (origin.Size != edited.Size)
+            {
+                Console.WriteLine("error, bitmaps are not of equal size. stopping program now. press enter to leave");
+                Console.ReadLine();
+                Application.Exit();
+            }
+            else
+            {
+                Bitmap bitmap = new Bitmap(origin.Width, origin.Height, pictureBox1.CreateGraphics());
+                for (int x=0;x<origin.Width;x++)
+                {
+                    for (int y=0;y<origin.Height;y++)
+                    {
+                        c1 = origin.GetPixel(x, y);
+                        c2 = edited.GetPixel(x, y);
+                        if (c1.R != c2.R)
+                        {
+                            bitmap.SetPixel(x, y,Color.Red);
+                        }
+                        else
+                        {
+                            bitmap.SetPixel(x, y, Color.White);
+                        }
+                    }
+                }
+                bitmap.Save((Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)) + "\\diffchecker.png", System.Drawing.Imaging.ImageFormat.Png);
+            }
+
+        }
     }
 }
